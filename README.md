@@ -1,4 +1,5 @@
 Ovládací program pro odpalování ohňostrojů
+Pro MCU ATMEGA2560 - Arduino Mega 2560
 
  * Program vyžaduje knihovny LiquidCrystal_I2C a Streaming.
  * Pin A12 slouží jako indikace připravenosti na první odpal - log HIGH.
