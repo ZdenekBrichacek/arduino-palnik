@@ -41,6 +41,7 @@ int BTN_PAL_STAT_old = 0;
 int BTN_MODE_old = 1;
 int out;
 int BTN_PAL_STAT = 0;
+int iTmp = 0;
 
 int HBledState = LOW;
 
@@ -86,11 +87,15 @@ void setup()
     lcd.print("... Check");
     Serial.println("... Checking...");
     digitalWrite(PIN_REL_CHK, HIGH); // Zapneme testovací režim - relé do HIGH
-    delay(100); // Počkáme 100 ms na přepnutí relé a budeme testovat výstup palníku
+    delay(200); // Počkáme 200 ms na přepnutí relé a budeme testovat výstup palníku
     for (out = 0 ; out < 58 ; ++out) {
-      digitalWrite(outputs[out], LOW); // Vypneme výstup
-      pinMode(outputs[out], INPUT); // Nastavíme výstup jako vstup
-      Serial << "Stat: " << out << "[" << outputs[out] << "]:" << digitalRead(outputs[out]) << endl; // Otestujeme výstup a vypíšeme stav
+      pinMode(outputs[out], INPUT); // Nastavíme pin jako vstup
+      digitalWrite(outputs[out], HIGH); // Připojíme pull-up
+      if (digitalRead(outputs[out]) == LOW)
+        iTmp = HIGH;
+      else
+        iTmp = LOW;
+      Serial << "Stat: " << out << "[" << outputs[out] << "]:" << iTmp << endl; // Otestujeme výstup a vypíšeme stav
     }
     lcd.print(" ... OK");
     Serial.println("... checked");
@@ -117,15 +122,20 @@ void loop()
     if (BTN_PAL_STAT == 0) {
       if (digitalRead(PIN_MAN_MODE) == 0) { // Zpracování předchozího stisku - test, zda palník odpálil
         digitalWrite(outputs[out], LOW); // Vypneme výstup
-        pinMode(outputs[out], INPUT); // Nastavíme výstup jako vstup
+        pinMode(outputs[out], INPUT); // Nastavíme pin jako vstup
         lcd.clear();
         lcd.setCursor(0, 1);
         digitalWrite(PIN_REL_CHK, HIGH); // Zapneme testovací režim - relé do HIGH
         delay(100); // Počkáme 100 ms na přepnutí relé a budeme testovat výstup palníku
-        lcd << "Stat: " << out << "[" << outputs[out] << "]:" << digitalRead(outputs[out]); // Otestujeme výstup a vypíšeme stav
-        Serial << "Stat: " << out << "[" << outputs[out] << "]:" << digitalRead(outputs[out]) << endl; // Otestujeme výstup a vypíšeme stav
-        pinMode(outputs[out], OUTPUT); // Opět přenastavíme výstup jako výstup (ze vstupu pro režim testování)
-        digitalWrite(outputs[out], LOW); // Pro jistotu nastavíme ještě jednou LOW
+        digitalWrite(outputs[out], HIGH); // Připojíme pull-up k testovanému pinu
+        if (digitalRead(outputs[out]) == LOW)
+          iTmp = HIGH;
+        else
+          iTmp = LOW;
+        lcd << "Stat: " << out << "[" << outputs[out] << "]:" << iTmp; // Otestujeme výstup a vypíšeme stav
+        Serial << "Stat: " << out << "[" << outputs[out] << "]:" << iTmp << endl; // Otestujeme výstup a vypíšeme stav
+        pinMode(outputs[out], OUTPUT); // Opět přenastavíme pin jako výstup (ze vstupu pro režim testování)
+        digitalWrite(outputs[out], LOW); // Nastavíme na pinu LOW
         digitalWrite(PIN_REL_CHK, LOW); // Ukončíme test - relé do LOW
       }
       ++out; // Inkrementace pozice výstupu - číslo výstupu je z pole outputs[out]
