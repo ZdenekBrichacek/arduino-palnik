@@ -157,8 +157,12 @@ void loop()
 //        delay(100); // Počkáme 100 ms na přepnutí relé a budeme testovat výstup palníku
 //        pinMode(outputs[out], INPUT);
         lcd.setCursor(0, 1);
-        lcd << "Stat: " << digitalRead(outputs[out]) << " "; // Otestujeme výstup a vypíšeme stav
-        Serial << "Stat: " << digitalRead(outputs[out]) << endl; // Otestujeme výstup a vypíšeme stav
+        if (digitalRead(outputs[out]) == LOW)
+          iTmp = HIGH;
+        else
+          iTmp = LOW;
+        lcd << "Stat: " << iTmp << " "; // Otestujeme výstup a vypíšeme stav
+        Serial << "Stat: " << iTmp << endl; // Otestujeme výstup a vypíšeme stav
 //        digitalWrite(PIN_REL_CHK, LOW); // Ukončíme test - relé do LOW
       }
     } else {
