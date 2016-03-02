@@ -62,7 +62,7 @@ void setup()
   pinMode(PIN_MAN_MODE, INPUT);     // Nastavení tlačítka módu
   digitalWrite(PIN_MAN_MODE, HIGH);
   pinMode(PIN_REL_CHK, OUTPUT);     // Nastavení výstupu pro přepnutí relé pro režim odpalování
-  digitalWrite(PIN_REL_CHK, LOW);
+  digitalWrite(PIN_REL_CHK, HIGH);
   pinMode(PIN_HB, OUTPUT);     // Pin 13 - heartbeat
 
   for (out = 0 ; out < 58 ; ++out) {
@@ -78,7 +78,7 @@ void setup()
   lcd.print("Ready to operate.");
   BTN_MODE_old = digitalRead(PIN_MAN_MODE);
   if (BTN_MODE_old == 0) { // Inicializace režimu pro odpal
-    digitalWrite(PIN_REL_CHK, LOW); // Vypneme testovací režim - relé do LOW
+    digitalWrite(PIN_REL_CHK, HIGH); // Vypneme testovací režim - relé do HIGH
     lcd.setCursor(0, 1);
     lcd.print("... Fire mode!");
     Serial.println("... Fire mode!");
@@ -86,7 +86,7 @@ void setup()
     lcd.setCursor(0, 1);
     lcd.print("... Check");
     Serial.println("... Checking...");
-    digitalWrite(PIN_REL_CHK, HIGH); // Zapneme testovací režim - relé do HIGH
+    digitalWrite(PIN_REL_CHK, LOW); // Zapneme testovací režim - relé do LOW
     delay(200); // Počkáme 200 ms na přepnutí relé a budeme testovat výstup palníku
     for (out = 0 ; out < 58 ; ++out) {
       pinMode(outputs[out], INPUT); // Nastavíme pin jako vstup
@@ -125,7 +125,7 @@ void loop()
         pinMode(outputs[out], INPUT); // Nastavíme pin jako vstup
         lcd.clear();
         lcd.setCursor(0, 1);
-        digitalWrite(PIN_REL_CHK, HIGH); // Zapneme testovací režim - relé do HIGH
+        digitalWrite(PIN_REL_CHK, LOW); // Zapneme testovací režim - relé do LOW
         delay(100); // Počkáme 100 ms na přepnutí relé a budeme testovat výstup palníku
         digitalWrite(outputs[out], HIGH); // Připojíme pull-up k testovanému pinu
         if (digitalRead(outputs[out]) == LOW)
@@ -136,7 +136,7 @@ void loop()
         Serial << "Stat: " << out << "[" << outputs[out] << "]:" << iTmp << endl; // Otestujeme výstup a vypíšeme stav
         pinMode(outputs[out], OUTPUT); // Opět přenastavíme pin jako výstup (ze vstupu pro režim testování)
         digitalWrite(outputs[out], LOW); // Nastavíme na pinu LOW
-        digitalWrite(PIN_REL_CHK, LOW); // Ukončíme test - relé do LOW
+        digitalWrite(PIN_REL_CHK, HIGH); // Ukončíme test - relé do HIGH
       }
       ++out; // Inkrementace pozice výstupu - číslo výstupu je z pole outputs[out]
       if (out >= 58) { // Pokud jsme na konci pole, začneme znovu - je to samozřejmě zbytečné, ale hodí se pro ladění zařízení
@@ -153,9 +153,6 @@ void loop()
         lcd.clear();
         lcd << "Chk num " << out << "[" << outputs[out] << "]>         ";
         Serial << "Chk num " << out << "[" << outputs[out] << "]> " << endl;
-//        digitalWrite(PIN_REL_CHK, HIGH); // Zapneme testovací režim - relé do HIGH
-//        delay(100); // Počkáme 100 ms na přepnutí relé a budeme testovat výstup palníku
-//        pinMode(outputs[out], INPUT);
         lcd.setCursor(0, 1);
         if (digitalRead(outputs[out]) == LOW)
           iTmp = HIGH;
@@ -163,7 +160,7 @@ void loop()
           iTmp = LOW;
         lcd << "Stat: " << iTmp << " "; // Otestujeme výstup a vypíšeme stav
         Serial << "Stat: " << iTmp << endl; // Otestujeme výstup a vypíšeme stav
-//        digitalWrite(PIN_REL_CHK, LOW); // Ukončíme test - relé do LOW
+//        digitalWrite(PIN_REL_CHK, HIGH); // Ukončíme test - relé do HIGH
       }
     } else {
       delay(100);
