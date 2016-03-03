@@ -15,9 +15,10 @@
  * Pin 13 je určen jako heartbeat.
  */
 
-#include <Wire.h> 
+#include <Arduino.h>
+#include <Wire.h>
 #include <LiquidCrystal_I2C.h>
-#include <Streaming.h> 
+#include <Streaming.h>
 
 //LiquidCrystal_I2C lcd(0x27, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);
 LiquidCrystal_I2C lcd(0x27, 20, 4);
@@ -49,7 +50,7 @@ void setup()
 {
   Serial.begin(9600);
   Serial.println("Starting program...");
-  Serial.println(""); 
+  Serial.println("");
 
   lcd.init();
   lcd.begin(16,2);
@@ -86,7 +87,7 @@ void setup()
   float voltage1 = analogRead(PIN_VOLT_U1) * 5 / 1023;
   float voltage2 = analogRead(PIN_VOLT_U2) * 5 / 1023;
   lcd << "U1:" << voltage1 << "V,2:" << voltage2 << "V";
-  
+
   BTN_MODE_old = digitalRead(PIN_MAN_MODE);
   if (BTN_MODE_old == 0) { // Inicializace režimu pro odpal
     digitalWrite(PIN_REL_CHK, HIGH); // Vypneme testovací režim - relé do HIGH
@@ -118,15 +119,17 @@ void loop()
 {
   if (digitalRead(PIN_MAN_MODE) != BTN_MODE_old) { // Při změně módu reset zařízení
     lcd.clear();
-    lcd << "Mode changed: restart!";
     Serial << "Mode changed: restart!" << endl;
-    delay(200);
+    lcd << "Mode changed:";
+    lcd.setCursor(0, 1);
+    lcd << "... restart!";
+    delay(1000);
     asm volatile( // Restart chipu
       "clr r30 \n\t"
       "clr r31 \n\t"
       "ijmp \n\t");
   }
-  
+
   BTN_PAL_STAT = digitalRead(PIN_MAN_PAL);
   if (BTN_PAL_STAT != BTN_PAL_STAT_old) {
     BTN_PAL_STAT_old = BTN_PAL_STAT;
@@ -159,7 +162,7 @@ void loop()
         lcd.setCursor(0, 0);
         lcd << "Fire num " << out << "[" << outputs[out] << "]!         ";
         Serial << "Fire num " << out << "[" << outputs[out] << "]! " << endl;
-        delay(100);        
+        delay(100);
       } else { // Test - tlačítko MODE rozepnuto
         lcd.clear();
         lcd << "Chk num " << out << "[" << outputs[out] << "]>         ";
@@ -179,10 +182,10 @@ void loop()
   } else {
     delay(100);
   }
-  
+
   if (HBledState == LOW)
     HBledState = HIGH;
   else
     HBledState = LOW;
-  digitalWrite(PIN_HB, HBledState); 
+  digitalWrite(PIN_HB, HBledState);
 }
